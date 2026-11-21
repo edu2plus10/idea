@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>A-Frame：立方体</title>
+  <!-- 3D空間を表示するA-Frameを読み込む -->
+  <script src="https://aframe.io/releases/1.7.1/aframe.min.js"></script>
+</head>
+<body>
+  <!-- A-Frameの3D空間。スマホで方向センサーの許可が必要な場合は案内が出る -->
+  <a-scene background="color: #ECEFF4" vr-mode-ui="enabled: false">
+    <!-- 正面3m先に立方体を1つ置く -->
+    <a-box position="0 0 -3" color="#4D82E8"></a-box>
+
+    <!-- スマホの向きで視点が変化。PCではドラッグで見回せる -->
+    <a-camera look-controls wasd-controls="enabled: false"></a-camera>
+  </a-scene>
+</body>
+</html>

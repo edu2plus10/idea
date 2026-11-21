@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MediaPipe：手の検出</title>
+  <style>
+    /* 映像を画面幅に合わせ、鏡のように左右反転する */
+    video { width: 100%; transform: scaleX(-1); }
+  </style>
+</head>
+<body>
+  <h1>手・指の検出</h1>
+  <button id="start">カメラを開始</button>
+  <p id="message">開始ボタンを押してください</p>
+  <video id="video" autoplay muted playsinline></video>
+
+  <script type="module">
+    // MediaPipeの手の認識機能を読み込む
+    import { FilesetResolver, HandLandmarker } from
+      'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14';
+
+    const video = document.getElementById('video');
+    const message = document.getElementById('message');
+    const button = document.getElementById('start');
+
+    button.addEventListener('click', async () => {
+      button.disabled = true;
+      message.textContent = '準備中…';
+
+      try {
+        // カメラを起動する（HTTPS環境と利用許可が必要）
+        video.srcObject = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: 'user' }
+        });
+        await video.play();
+
+        // 認識に必要なプログラムとモデルを読み込む
+        const vision = await FilesetResolver.forVisionTasks(
+          'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm'
+        );
+        const hand = await HandLandmarker.createFromOptions(vision, {
+          baseOptions: {
+            modelAssetPath: 'https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task'
+          },
+          runningMode: 'VIDEO',
+          numHands: 1
+        });
+
+        button.hidden = true;
+        let lastTime = -1;
+
+        function detect() {
+          // 同じ映像フレームを繰り返し解析しない
+          if (video.readyState >= 2 && video.currentTime !== lastTime) {
+            lastTime = video.currentTime;
+            const result = hand.detectForVideo(video, performance.now());
+
+            // 特徴点が見つかったかどうかだけをメッセージにする
+            message.textContent = result.landmarks.length > 0
+              ? '手・指を検出しました！'
+              : '手・指は見つかりません';
+          }
+          requestAnimationFrame(detect);
+        }
+        detect();
+      } catch (error) {
+        message.textContent = '起動できません。カメラの許可とHTTPS接続を確認してください。';
+        button.disabled = false;
+        console.error(error);
+      }
+    });
+  </script>
+</body>
+</html>
