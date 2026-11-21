@@ -10,8 +10,12 @@
 <body>
   <!-- A-Frameの3D空間。スマホで方向センサーの許可が必要な場合は案内が出る -->
   <a-scene background="color: #ECEFF4" vr-mode-ui="enabled: false">
-    <!-- 正面3m先に立方体を1つ置く -->
-    <a-box position="0 0 -3" color="#4D82E8"></a-box>
+    <!-- 全体をうっすら照らす環境光と、面に陰影をつける方向光 -->
+    <a-light type="ambient" intensity="0.35"></a-light>
+    <a-light type="directional" position="-1 3 2" intensity="0.9"></a-light>
+
+    <!-- 正面3m先に立方体を1つ配置。少し回して2つの面を見せる -->
+    <a-box position="0 0 -3" rotation="0 25 0" color="#4D82E8"></a-box>
 
     <!-- スマホの向きで視点が変化。PCではドラッグで見回せる -->
     <a-camera look-controls wasd-controls="enabled: false"></a-camera>
